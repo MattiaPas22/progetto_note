@@ -72,8 +72,7 @@ class NoteController extends Controller
         $note = Note::findOrFail($id); // Recupera la nota dal database
         $note->delete(); // Elimina la nota
 
-        return redirect()->route('notes.index')->with('success', 'Nota eliminata con successo!');
-    }
+        return redirect()->route('notes.index')->with('success', 'Nota eliminata con successo!');    }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -88,7 +87,7 @@ class NoteController extends Controller
 
         return view(view: 'notes.show', data: ['note' => $note]);
     }
-    
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     // FUNZIONE --> AUTENTICAZIONE UTENTE (automatica)
@@ -96,4 +95,32 @@ class NoteController extends Controller
     {
         $this->middleware('auth');
     }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    
+    // FUNZIONE --> BARRA DI RICERCA
+    public function search(Request $request)
+    {
+    // Sanificazione input
+    $query = trim($request->input('query'));
+
+    // Esegui la ricerca nel titolo o nel corpo della nota
+    $notes = Note::where('title', 'LIKE', "%$query%")
+                ->orWhere('body', 'LIKE', "%$query%")
+                ->paginate(10);
+    
+    if (count($notes) > 0) {
+        return view('notes.index', ['notes' => $notes]);
+    } else {
+        return redirect()->route('notes.index')->with('error', 'Nessun risultato trovato per la ricerca: ' . $query);
+    }
+
+    
+
+
+}
+
+
+
+
 }

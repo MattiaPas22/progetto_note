@@ -1,6 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+
 <table class="table">
     <thead>
       <tr>
@@ -16,21 +29,22 @@
         @foreach ($notes as $note)
         <tr>
             <th scope="row">{{ $note->id }}</th>
-            <td> <a href="{{route('notes.show',$note->id)}}">{{ $note->title }}</td>
+            <td> <a href="{{route('notes.show',$note->id)}}">{{ $note->title }}</a></td>
             <td>{{ $note->body }}</td>
             <td>{{ $note->user->name }}</td>
             <td>{{ $note->created_at }}</td>
             <td>{{ $note->updated_at }}</td>
         </tr>
-
         @endforeach
     </tbody>
 </table>
+
 <div class="d-flex justify-content-between">
     <a href="{{ route('notes.create') }}" class="btn btn-primary">Create Note</a>
     <form action="{{ route('notes.index') }}" method="GET" class="form-inline">
     </form>
 </div>
+
 <br>
 
 {{ $notes->links() }}

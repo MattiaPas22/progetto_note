@@ -2,29 +2,30 @@
 
 @section('content')
 <div class="container">
-    <h1>Create Note</h1>
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+
+
+    <h2>Crea una nuova Nota</h2>
+
+    <!-- Form di creazione della nota -->
     <form action="{{ route('notes.store') }}" method="POST">
         @csrf
         <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
+            <label for="title" class="form-label">Titolo</label>
+            <input type="text" name="title" class="form-control" id="title" value="{{ old('title') }}" required>
         </div>
+
         <div class="mb-3">
-            <label for="body" class="form-label">Body</label>
-            <textarea class="form-control" id="body" name="body" rows="5" required></textarea>
+            <label for="body" class="form-label">Testo</label>
+            <textarea name="body" class="form-control" id="body" rows="4" required>{{ old('body') }}</textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Save</button>
+
+        <button type="submit" class="btn btn-primary">Crea Nota</button>
     </form>
-    <div class="mt-3">
-        <a href="{{ route('notes.index') }}" class="btn btn-secondary">Back to Notes</a>
+
+    <!-- Link per tornare alla lista delle note -->
+    <div class="d-flex justify-content-between mt-3">
+        <a href="{{ route('notes.index') }}" class="btn btn-secondary">Torna alla lista</a>
+    </div>
+
 </div>
 @endsection

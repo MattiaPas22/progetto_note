@@ -26,6 +26,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
 });
 
+// ROUTE ---> BARRA DI RICERCA
+Route::get('/notes/search', [NoteController::class, 'search'])->name('notes.search');
+
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

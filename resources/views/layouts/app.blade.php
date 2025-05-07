@@ -30,7 +30,6 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
-
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -69,6 +68,29 @@
                         @endguest
                     </ul>
                 </div>
+            </div>
+        </nav>
+
+        {{-- Navbar secondaria --}}
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- Link Home -->
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('notes.index') }}">Home</a>
+                    </li>
+
+                    <!-- Link per creare una nuova nota -->
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('notes.create') }}">Crea Nota</a>
+                    </li>
+                    
+                </ul>
+                <form class="d-flex" role="search" method="GET" action="{{ route('notes.search') }}">
+                    <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search"/>
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+                
             </div>
         </nav>
 
