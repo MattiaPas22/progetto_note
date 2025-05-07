@@ -84,6 +84,10 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ route('notes.create') }}">Crea Nota</a>
                     </li>
+                    <!-- Link per visualizzare il cestino -->
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('notes.trash') }}">Cestino</a>
+                    </li>
                     
                 </ul>
                 <form class="d-flex" role="search" method="GET" action="{{ route('notes.search') }}">

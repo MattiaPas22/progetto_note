@@ -37,7 +37,7 @@
             <td>{{ $note->updated_at }}</td>
             <td>
               <div class="d-flex justify-content-between">
-                <a href="{{ route('notes.show',$note->id) }}" class="btn btn-primary">Mostra</a>
+                <a href="{{ route('notes.restore',$note->id) }}" class="btn btn-primary">Restore</a>
                 
             </div>
         </tr>
@@ -45,11 +45,7 @@
     </tbody>
 </table>
 
-<div class="d-flex justify-content-between">
-    <a href="{{ route('notes.create') }}" class="btn btn-primary">Create Note</a>
-    <form action="{{ route('notes.index') }}" method="GET" class="form-inline">
-    </form>
-</div>
+
 
 <br>
 

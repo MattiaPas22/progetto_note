@@ -30,10 +30,26 @@ class NoteController extends Controller
     // FUNZIONE --> STORAGGIO DELLE NOTE
     public function store(Request $request)
     {
+
+        $max_size = (int) ini_get('upload_max_filesize') * 1000;
         $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required',
+            'image' => [
+                'required',
+                'file',
+                'image',
+                'max'.$max_size,
+            ]
         ]);
+
+        $file= $request->file('image');
+        $filePath = $request->file('image')->store('uploads', 'public'); // Salva l'immagine nella cartella 'images' del disco 'public'
+
+        if (!$request->file('image')->isValid()) {
+            return back()->with('error', 'File non valido')->with('image', $filePath);
+        }
+
         $note = new Note();
         $note->title = $request->input('title');
         $note->body = $request->input('body');
@@ -85,7 +101,7 @@ class NoteController extends Controller
             return "Nota non trovata";
         }
 
-        return view(view: 'notes.show', data: ['note' => $note]);
+        return view('notes.show', compact('note'));
     }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -115,12 +131,26 @@ class NoteController extends Controller
         return redirect()->route('notes.index')->with('error', 'Nessun risultato trovato per la ricerca: ' . $query);
     }
 
-    
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+// FUNZIONE --> CESTINO DELLE NOTE
+public function trashed(): View
+{
+    $notes = Note::onlyTrashed()->with('user')->paginate(10); // Recupera le note eliminate
+    return view('notes.trash', ['notes' => $notes]); // Passa le note alla vista
 
 
 }
 
+// FUNZIONE --> RIPRISTINO DELLE NOTE
+public function restore($id)
+{
+    $note = Note::onlyTrashed()->find($id);
+    $note->restore();
 
-
+    return redirect()->route('notes.index')->with('success', 'Nota ripristinata con successo.');
+}
 
 }
