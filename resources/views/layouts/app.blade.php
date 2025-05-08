@@ -20,13 +20,21 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
+
+               <!-- Logo al posto del nome dell'app -->
+            <a class="navbar-brand" href="{{ url('/') }}">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_Notes_icon.svg/1200px-Apple_Notes_icon.svg.png" alt="Logo" style="height: 40px;"> AppNotes
+            </a>
+
+           
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
+                <div>
+                    <h1 class="text-center">Annota, sennò te lo scordi</h1>
+                </div>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
@@ -38,19 +46,19 @@
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                    <a class="btn btn-primary mx-2" href="{{ route('login') }}">{{ __('Login') }}</a>
                                 </li>
                             @endif
 
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                    <a class="btn btn-secondary mx-2" href="{{ route('register') }}">{{ __('Register') }}</a>
                                 </li>
                             @endif
                         @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                            <li class="nav-item dropdown mx-2">
+                                <a id="navbarDropdown" class="btn btn-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Benvenuto ❤️, {{ Auth::user()->name }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
@@ -74,27 +82,25 @@
         {{-- Navbar secondaria --}}
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav mb-2 mb-lg-0">
                     <!-- Link Home -->
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('notes.index') }}">Home</a>
+                        <a class="btn btn-primary mx-2" href="{{ route('notes.index') }}">Home</a>
                     </li>
 
                     <!-- Link per creare una nuova nota -->
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('notes.create') }}">Crea Nota</a>
+                        <a class="btn btn-success mx-2" href="{{ route('notes.create') }}">Crea Nota</a>
                     </li>
                     <!-- Link per visualizzare il cestino -->
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('notes.trash') }}">Cestino</a>
+                        <a class="btn btn-danger mx-2" href="{{ route('notes.trash') }}">Cestino</a>
                     </li>
-                    
                 </ul>
                 <form class="d-flex" role="search" method="GET" action="{{ route('notes.search') }}">
                     <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search"/>
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
-                
             </div>
         </nav>
 

@@ -19,7 +19,7 @@ class NoteController extends Controller
 
         return view('notes.index', ['notes' => $notes]);
     }
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     // FUNZIONE --> CREAZIONE DELLE NOTE 
     public function create()
     {
@@ -29,38 +29,42 @@ class NoteController extends Controller
 
     // FUNZIONE --> STORAGGIO DELLE NOTE
     public function store(Request $request)
-    {
+{
+    $max_size = (int) ini_get('upload_max_filesize') * 1000;
 
-        $max_size = (int) ini_get('upload_max_filesize') * 1000;
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'body' => 'required',
-            'image' => [
-                'required',
-                'file',
-                'image',
-                'max'.$max_size,
-            ]
-        ]);
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'body' => 'required',
+        'image' => [
+            'required',
+            'file',
+            'image',
+            'max:'.$max_size,
+        ]
+    ]);
 
-        $file= $request->file('image');
-        $filePath = $request->file('image')->store('uploads', 'public'); // Salva l'immagine nella cartella 'images' del disco 'public'
+    $file = $request->file('image');
 
-        if (!$request->file('image')->isValid()) {
-            return back()->with('error', 'File non valido')->with('image', $filePath);
-        }
-
-        $note = new Note();
-        $note->title = $request->input('title');
-        $note->body = $request->input('body');
-        $note->user_id = auth()->user()->id; // Associa la nota all'utente autenticato
-        $note->save(); // Salva la nota nel database
-
-        return redirect()->route('notes.index')->with('success', 'Nota creata con successo!');
+    if (!$file->isValid()) {
+        return back()->with('error', 'File non valido');
     }
 
+    $filePath = $file->store('uploads', 'public');
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    $note = new Note();
+    $note->title = $request->input('title');
+    $note->body = $request->input('body');
+    $note->image_url = $filePath; // <-- CORRETTO
+    $note->user_id = auth()->user()->id;
+    $note->save();
+
+    return redirect()->route('notes.index')->with('success', 'Nota creata con successo!');
+}
+
+
+
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     // FUNZIONE --> MODIFICA DELLE NOTE
     public function edit(string $id)
@@ -80,7 +84,7 @@ class NoteController extends Controller
         return redirect()->route('notes.index')->with('success', 'Nota aggiornata con successo!');
     }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     // FUNZIONE --> CANCELLARE LE NOTE
     public function destroy(string $id)
@@ -88,9 +92,10 @@ class NoteController extends Controller
         $note = Note::findOrFail($id); // Recupera la nota dal database
         $note->delete(); // Elimina la nota
 
-        return redirect()->route('notes.index')->with('success', 'Nota eliminata con successo!');    }
+        return redirect()->route('notes.index')->with('success', 'Nota eliminata con successo!');
+    }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     // FUNZIONE --> MOSTRARE LE NOTE
     public function show(string $id)
@@ -104,7 +109,7 @@ class NoteController extends Controller
         return view('notes.show', compact('note'));
     }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     // FUNZIONE --> AUTENTICAZIONE UTENTE (automatica)
     public function __construct()
@@ -112,45 +117,43 @@ class NoteController extends Controller
         $this->middleware('auth');
     }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
     // FUNZIONE --> BARRA DI RICERCA
     public function search(Request $request)
     {
-    // Sanificazione input
-    $query = trim($request->input('query'));
+        // Sanificazione input
+        $query = trim($request->input('query'));
 
-    // Esegui la ricerca nel titolo o nel corpo della nota
-    $notes = Note::where('title', 'LIKE', "%$query%")
-                ->orWhere('body', 'LIKE', "%$query%")
-                ->paginate(10);
-    
-    if (count($notes) > 0) {
-        return view('notes.index', ['notes' => $notes]);
-    } else {
-        return redirect()->route('notes.index')->with('error', 'Nessun risultato trovato per la ricerca: ' . $query);
+        // Esegui la ricerca nel titolo o nel corpo della nota
+        $notes = Note::where('title', 'LIKE', "%$query%")
+            ->orWhere('body', 'LIKE', "%$query%")
+            ->paginate(10);
+
+        if (count($notes) > 0) {
+            return view('notes.index', ['notes' => $notes]);
+        } else {
+            return redirect()->route('notes.index')->with('error', 'Nessun risultato trovato per la ricerca: ' . $query);
+        }
     }
 
-}
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-// FUNZIONE --> CESTINO DELLE NOTE
-public function trashed(): View
-{
-    $notes = Note::onlyTrashed()->with('user')->paginate(10); // Recupera le note eliminate
-    return view('notes.trash', ['notes' => $notes]); // Passa le note alla vista
+    // FUNZIONE --> CESTINO DELLE NOTE
+    public function trashed(): View
+    {
+        $notes = Note::onlyTrashed()->with('user')->paginate(10); // Recupera le note eliminate
+        return view('notes.trash', ['notes' => $notes]); // Passa le note alla vista
 
 
-}
+    }
 
-// FUNZIONE --> RIPRISTINO DELLE NOTE
-public function restore($id)
-{
-    $note = Note::onlyTrashed()->find($id);
-    $note->restore();
+    // FUNZIONE --> RIPRISTINO DELLE NOTE
+    public function restore($id)
+    {
+        $note = Note::onlyTrashed()->find($id);
+        $note->restore();
 
-    return redirect()->route('notes.index')->with('success', 'Nota ripristinata con successo.');
-}
-
+        return redirect()->route('notes.index')->with('success', 'Nota ripristinata con successo.');
+    }
 }
